@@ -1,5 +1,6 @@
 import os
 import qrcode
+import base64
 
 class QRCodeGenerator:
     def __init__(self, url, image_path):
@@ -10,8 +11,8 @@ class QRCodeGenerator:
         qr = qrcode.QRCode(
             version=1,
             error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=2,
-            border=2,
+            box_size=10,
+            border=4,
         )
         qr.add_data(self.url)
         qr.make(fit=True)
@@ -21,22 +22,13 @@ class QRCodeGenerator:
         img.save(self.image_path)
         print("QR code image saved successfully:", self.image_path)
 
-        # Display the QR code in the terminal
-        self.display_ascii_qr_code()
+        # Convert the image to base64
+        with open(self.image_path, "rb") as image_file:
+            base64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
-    def display_ascii_qr_code(self):
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=1,
-            border=4,
-        )
-        qr.add_data(self.url)
-        qr.make(fit=True)
-
-        # Print the ASCII representation of the QR code
-        qr.make(fit=True)
-        qr.print_ascii()
+        # Embed the base64-encoded image into README.md using Markdown
+        with open("README.md", "a") as readme_file:
+            readme_file.write(f"\n\n![QR Code](data:image/png;base64,{base64_image})")
 
 if __name__ == "__main__":
     # Get the current directory where the script is located
